@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,10 +8,15 @@ public class Mov : MonoBehaviour
     [SerializeField] float speed;
     [SerializeField] BoxCollider2D pies;
     [SerializeField] float jumpSpeed;
+    [SerializeField] float speedDash;
+    [SerializeField] float dashSeconds;
 
     Animator myAnimator;
     Rigidbody2D myBody;
     BoxCollider2D myCollider;
+    float movh = 1;
+    float canFire;
+    float isDashing=0;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,10 +27,33 @@ public class Mov : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(Time.deltaTime);
         Mover();
         Saltar();
         Falling();
         Fire();
+        Dash();
+    }
+
+    void Dash()
+    {
+        
+        if (Input.GetKey(KeyCode.C))
+        {
+            if (isDashing <= dashSeconds){
+                myAnimator.SetBool("dashing", true);
+                transform.Translate(new Vector2(transform.localScale.x * speedDash * Time.deltaTime, 0));
+                isDashing = Time.deltaTime + isDashing;
+            }else{
+                myAnimator.SetBool("dashing", false);
+            }
+        }
+        else{
+            myAnimator.SetBool("dashing", false);
+            // isDashing = isDashing - Time.deltaTime;
+            isDashing = 0;
+        }
+            
     }
 
     void Fire() 
