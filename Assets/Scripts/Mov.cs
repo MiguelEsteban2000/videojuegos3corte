@@ -14,7 +14,6 @@ public class Mov : MonoBehaviour
     Animator myAnimator;
     Rigidbody2D myBody;
     BoxCollider2D myCollider;
-    float movh = 1;
     float canFire;
     float isDashing=0;
     // Start is called before the first frame update
@@ -84,13 +83,23 @@ public class Mov : MonoBehaviour
         //bool isGrounded=pies.IsTouchingLayers(LayerMask.GetMask("Ground"));
         if (isGrounded() && !myAnimator.GetBool("jumping"))
         {
+
             myAnimator.SetBool("falling", false);
             myAnimator.SetBool("jumping", false);
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 myAnimator.SetTrigger("takeOf");
                 myAnimator.SetBool("jumping",true);
-                myBody.AddForce(new Vector2(0, jumpSpeed),ForceMode2D.Impulse);
+                if (Input.GetKey(KeyCode.C)){
+                    // if (isDashing <= dashSeconds){{
+                    myBody.AddForce(new Vector2(0, jumpSpeed+8),ForceMode2D.Impulse);
+                    // }else{
+
+                    // }
+                }else{
+                    myBody.AddForce(new Vector2(0, jumpSpeed),ForceMode2D.Impulse);
+                }
+                
             }
         }
     }
