@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: s_idle
+  m_Name: s_dash
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
@@ -19,8 +19,10 @@ AnimationClip:
   m_FloatCurves: []
   m_PPtrCurves:
   - curve:
+    - time: 0
+      value: {fileID: -1087958723078383255, guid: 3fea9e70b5ddfeb4ba3b01d7faf57ff2, type: 3}
     - time: 0.083333336
-      value: {fileID: -2390051876051868894, guid: b2481200279d01447a85707ebf65685f, type: 3}
+      value: {fileID: -3146271516288795623, guid: 3fea9e70b5ddfeb4ba3b01d7faf57ff2, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -40,7 +42,8 @@ AnimationClip:
       customType: 23
       isPPtrCurve: 1
     pptrCurveMapping:
-    - {fileID: -2390051876051868894, guid: b2481200279d01447a85707ebf65685f, type: 3}
+    - {fileID: -1087958723078383255, guid: 3fea9e70b5ddfeb4ba3b01d7faf57ff2, type: 3}
+    - {fileID: -3146271516288795623, guid: 3fea9e70b5ddfeb4ba3b01d7faf57ff2, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}

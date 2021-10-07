@@ -10,12 +10,16 @@ public class Mov : MonoBehaviour
     [SerializeField] float jumpSpeed;
     [SerializeField] float speedDash;
     [SerializeField] float dashSeconds;
+    [SerializeField] GameObject bala;
+    [SerializeField] float nextFire;
 
     Animator myAnimator;
     Rigidbody2D myBody;
     BoxCollider2D myCollider;
     float canFire;
     float isDashing=0;
+    bool canJump=true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,12 +30,12 @@ public class Mov : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(Time.deltaTime);
         Mover();
         Saltar();
         Falling();
         Fire();
         Dash();
+        DobleSalto();
     }
 
     void Dash()
@@ -59,10 +63,19 @@ public class Mov : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.X)) 
         {
+            if(Time.time >= canFire){
+                canFire = Time.time + nextFire;
+                Instantiate(bala, transform.position - new Vector3(-transform.localScale.x*2, 0, 0), transform.rotation).transform.localScale = new Vector3 (transform.localScale.x, 1f, 1f);;
+            }
+            // myAnimator.SetTrigger("shootidleTG");
+            // myAnimator.SetBool("shootBool", true);
             myAnimator.SetLayerWeight(1, 1);
-        }
-        else
+        }else{
             myAnimator.SetLayerWeight(1, 0);
+            // myAnimator.SetBool("shootBool", false);
+        }
+        // else
+            
     }
 
     void Mover() 
@@ -81,13 +94,13 @@ public class Mov : MonoBehaviour
     void Saltar()
     {
         //bool isGrounded=pies.IsTouchingLayers(LayerMask.GetMask("Ground"));
-        if (isGrounded() && !myAnimator.GetBool("jumping"))
+        if (isGrounded())
         {
-
             myAnimator.SetBool("falling", false);
             myAnimator.SetBool("jumping", false);
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                canJump = true;
                 myAnimator.SetTrigger("takeOf");
                 myAnimator.SetBool("jumping",true);
                 if (Input.GetKey(KeyCode.C)){
@@ -114,7 +127,7 @@ public class Mov : MonoBehaviour
     {
         //return pies.IsTouchingLayers(LayerMask.GetMask("Ground"));
         RaycastHit2D myRay= Physics2D.Raycast(myCollider.bounds.center,Vector2.down,myCollider.bounds.extents.y + 0.2f,LayerMask.GetMask("Ground"));
-        Debug.DrawRay(myCollider.bounds.center,new Vector2(0, (myCollider.bounds.extents.y + 0.2f))*-1,Color.red);
+        // Debug.DrawRay(myCollider.bounds.center,new Vector2(0, (myCollider.bounds.extents.y + 0.2f))*-1,Color.red);
         return myRay.collider != null;
     }
 
@@ -122,5 +135,25 @@ public class Mov : MonoBehaviour
     {
         myAnimator.SetBool("jumping", false);
         myAnimator.SetBool("falling", true);
+    }
+
+    void DobleSalto() 
+    {
+        if (!isGrounded() && canJump)
+        {
+            if (canJump)
+            {
+                myAnimator.SetBool("falling", true);
+                myAnimator.SetBool("jumping", false);
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    canJump = false;
+                    print(canJump);
+                    myAnimator.SetTrigger("takeOf");
+                    myAnimator.SetBool("jumping", true);
+                    myBody.AddForce(new Vector2(0, jumpSpeed), ForceMode2D.Impulse);
+                }
+            }
+        }
     }
 }
