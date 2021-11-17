@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class Mov : MonoBehaviour
 {
     [SerializeField] float speed;
@@ -12,13 +12,22 @@ public class Mov : MonoBehaviour
     [SerializeField] float dashSeconds;
     [SerializeField] GameObject bala;
     [SerializeField] float nextFire;
+    [SerializeField] GameObject vfxMuerte;
+    [SerializeField] AudioClip sDisparar;
+    [SerializeField] AudioClip sSaltar;
+    [SerializeField] AudioClip sCaer;
+    [SerializeField] AudioClip sDash;
+    [SerializeField] AudioClip sMuerte;
+    [SerializeField] bool inmortal;
 
+    CircleCollider2D cc;
     Animator myAnimator;
     Rigidbody2D myBody;
     BoxCollider2D myCollider;
     float canFire;
     float isDashing=0;
     bool canJump=true;
+    bool pause = false;
 
     // Start is called before the first frame update
     void Start()
@@ -26,16 +35,22 @@ public class Mov : MonoBehaviour
         myAnimator = GetComponent<Animator>();
         myBody = GetComponent<Rigidbody2D>();
         myCollider = GetComponent<BoxCollider2D>();
+
+        //StartCoroutine(ShowTime());
     }
 
     void Update()
     {
-        Mover();
-        Saltar();
-        Falling();
-        Fire();
-        Dash();
-        DobleSalto();
+        if (!pause)
+        {
+            Mover();
+            Saltar();
+            Falling();
+            Fire();
+            Dash();
+            DobleSalto();
+        }
+
     }
 
     void Dash()
@@ -45,6 +60,7 @@ public class Mov : MonoBehaviour
         {
             if (isDashing <= dashSeconds){
                 myAnimator.SetBool("dashing", true);
+                AudioSource.PlayClipAtPoint(sDash, Camera.main.transform.position);
                 transform.Translate(new Vector2(transform.localScale.x * speedDash * Time.deltaTime, 0));
                 isDashing = Time.deltaTime + isDashing;
             }else{
@@ -65,6 +81,7 @@ public class Mov : MonoBehaviour
         {
             if(Time.time >= canFire){
                 canFire = Time.time + nextFire;
+                AudioSource.PlayClipAtPoint(sDisparar, Camera.main.transform.position);
                 Instantiate(bala, transform.position - new Vector3(-transform.localScale.x*2, 0, 0), transform.rotation).transform.localScale = new Vector3 (transform.localScale.x, 1f, 1f);;
             }
             // myAnimator.SetTrigger("shootidleTG");
@@ -103,6 +120,7 @@ public class Mov : MonoBehaviour
                 canJump = true;
                 myAnimator.SetTrigger("takeOf");
                 myAnimator.SetBool("jumping",true);
+                AudioSource.PlayClipAtPoint(sSaltar, Camera.main.transform.position);
                 if (Input.GetKey(KeyCode.C)){
                     // if (isDashing <= dashSeconds){{
                     myBody.AddForce(new Vector2(0, jumpSpeed+8),ForceMode2D.Impulse);
@@ -119,8 +137,9 @@ public class Mov : MonoBehaviour
 
     void Falling() 
     {
-        if (myBody.velocity.y < 0 && !myAnimator.GetBool("jumping"))
+        if (myBody.velocity.y < 0 && !myAnimator.GetBool("jumping")) { 
             myAnimator.SetBool("falling", true);
+        }
     }
     //ray cast:
     bool isGrounded() 
@@ -151,9 +170,38 @@ public class Mov : MonoBehaviour
                     print(canJump);
                     myAnimator.SetTrigger("takeOf");
                     myAnimator.SetBool("jumping", true);
+                    AudioSource.PlayClipAtPoint(sSaltar, Camera.main.transform.position);
                     myBody.AddForce(new Vector2(0, jumpSpeed), ForceMode2D.Impulse);
                 }
             }
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("enemigo")) 
+        {
+            if (!inmortal) { 
+            StartCoroutine("Die");
+            }
+        }
+    }
+
+    IEnumerator Die()
+    {
+        pause = true;
+        myCollider.enabled = false;
+        myBody.isKinematic = true;
+        myAnimator.SetBool("falling", false);
+        myAnimator.SetBool("muerte", true);
+        yield return new WaitForSeconds(1);
+        AudioSource.PlayClipAtPoint(sMuerte, Camera.main.transform.position);
+        Instantiate(vfxMuerte, transform.position, transform.rotation);
+        gameObject.GetComponent<SpriteRenderer>().enabled = false;
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadScene("Muerte");
+
+        
+     
     }
 }
